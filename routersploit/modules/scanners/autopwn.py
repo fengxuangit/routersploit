@@ -30,7 +30,8 @@ class Exploit(exploits.Exploit):
     }
     modules = ['routers', 'cameras', 'misc']
 
-    target = exploits.Option('', 'Target IP address e.g. 192.168.1.1')  # target address
+    target = exploits.Option('', 'Target IP address e.g. 192.168.1.1 or json str' +
+                            ' {"http://192.168.1.1":80, "http://192.168.1.2":90}')  # target address
     port = exploits.Option(80, 'Target port')  # default port
     threads = exploits.Option(8, "Number of threads")
 
@@ -42,6 +43,9 @@ class Exploit(exploits.Exploit):
     def run(self):
         self.vulnerabilities = []
         self.not_verified = []
+        target = utils.safe_json_loads(self.target)
+        if target:
+            self.target = target
 
         with threads.ThreadPoolExecutor(self.threads) as executor:
             for directory in self._exploits_directories:
@@ -67,17 +71,39 @@ class Exploit(exploits.Exploit):
         raise NotImplementedError("Check method is not available")
 
     def target_function(self, exploit):
+
+        if isinstance(self.target, dict):
+            self.multicheck(exploit)
+        elif isinstance(self.target, str):
+            self.siglecheck(exploit)
+        else:
+            pass
+
+
+    def siglecheck(self, exploit):
         exploit = exploit()
-        exploit.target = self.target
         exploit.port = self.port
+        exploit.target = self.target
 
         response = exploit.check()
+        self.getresponse(response, exploit)
 
+    def multicheck(self, exploit):
+        for ip in self.target.keys():
+            exp = exploit()
+            exp.port = self.target[ip]
+            exp.target = ip
+
+            response = exp.check()
+            self.getresponse(response, exp)
+
+
+    def getresponse(self, response, exploit):
         if response is True:
-            print_success("{} is vulnerable".format(exploit))
+            print_success("ip {0} port {1} {2} is vulnerable".format(exploit.target, exploit.port, exploit))
             self.vulnerabilities.append(exploit)
         elif response is False:
-            print_error("{} is not vulnerable".format(exploit))
+            print_error("ip {0} port {1} {2} is vulnerable".format(exploit.target, exploit.port, exploit))
         else:
-            print_status("{} could not be verified".format(exploit))
+            print_status("ip {0} port {1} {2} is vulnerable".format(exploit.target, exploit.port, exploit))
             self.not_verified.append(exploit)

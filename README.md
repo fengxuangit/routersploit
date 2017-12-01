@@ -115,6 +115,14 @@ Set options:
 	rsf (D-LINK DIR-300 & DIR-600 RCE) > set target http://192.168.1.1
 	[+] {'target': 'http://192.168.1.1'}
 
+### New Features
+    you can set target as json str, and it's will be multi check
+
+Set options:
+
+	rsf (D-LINK DIR-300 & DIR-600 RCE) > set target {"http://192.168.1.1":80, "http://192.168.1.2":90}
+	[+] {'target': {'http://192.168.1.1':80, 'http://192.168.1.2':90}}
+
 ### Run module
 
 You can exploit the target by issuing the 'run' or 'exploit' command:

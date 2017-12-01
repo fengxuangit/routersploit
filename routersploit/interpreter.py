@@ -111,7 +111,6 @@ class BaseInterpreter(object):
             stripped = len(original_line) - len(line)
             start_index = readline.get_begidx() - stripped
             end_index = readline.get_endidx() - stripped
-
             if start_index > 0:
                 cmd, args = self.parse_line(line)
                 if cmd == '':

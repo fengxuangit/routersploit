@@ -11,6 +11,7 @@ import select
 import socket
 import string
 import sys
+import json
 import threading
 from abc import ABCMeta, abstractmethod
 from distutils.util import strtobool
@@ -627,3 +628,13 @@ def mkdir_p(path):  # TODO: cover with tests
             print_success("Directory {path}".format(path=path))
         else:
             raise
+
+
+def safe_json_loads(jsonstr):
+    data = None
+    try:
+        data = json.loads(jsonstr)
+    except:
+        return False
+
+    return data
