@@ -631,6 +631,11 @@ def mkdir_p(path):  # TODO: cover with tests
 
 
 def safe_json_loads(jsonstr):
+    """
+    safe json loads
+    :param jsonstr:
+    :return:
+    """
     data = None
     try:
         data = json.loads(jsonstr)
@@ -638,3 +643,12 @@ def safe_json_loads(jsonstr):
         return False
 
     return data
+
+
+def check_file(filename):
+    '''
+    check filename is exists and can be read
+    :param filename:
+    :return:
+    '''
+    return os.path.exists(filename) and os.access(filename, os.R_OK)
